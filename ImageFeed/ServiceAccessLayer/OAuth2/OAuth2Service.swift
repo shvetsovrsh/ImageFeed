@@ -37,7 +37,7 @@ final class OAuth2Service {
     }
 }
 
-extension OAuth2Service {
+private extension OAuth2Service {
     private func object(
             for request: URLRequest,
             completion: @escaping (Result<OAuthTokenResponseBody, Error>) -> Void
