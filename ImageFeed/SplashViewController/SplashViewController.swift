@@ -7,6 +7,7 @@ import UIKit
 import ProgressHUD
 
 final class SplashViewController: UIViewController {
+    private let profileService = ProfileService.shared
     private let ShowAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
 
     private let oauth2Service = OAuth2Service()
@@ -60,6 +61,9 @@ extension SplashViewController: AuthViewControllerDelegate {
         dismiss(animated: true) { [weak self] in
             guard let self = self else { return }
             self.fetchOAuthToken(code)
+            if let token = self.oauth2TokenStorage.token {
+                self.fetchProfile(token: token)
+            }
         }
     }
 
@@ -70,8 +74,24 @@ extension SplashViewController: AuthViewControllerDelegate {
             case .success:
                 self.switchToTabBarController()
                 UIBlockingProgressHUD.dismiss()
-            case .failure:
+            case .failure(let error):
                 UIBlockingProgressHUD.dismiss()
+                print("Failed to fetch token: \(error)")
+                break
+            }
+        }
+    }
+
+    private func fetchProfile(token: String) {
+        profileService.fetchProfile(token) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success:
+                UIBlockingProgressHUD.dismiss()
+                self.switchToTabBarController()
+            case .failure(let error):
+                UIBlockingProgressHUD.dismiss()
+                print("Failed to fetch profile: \(error)")
                 break
             }
         }
