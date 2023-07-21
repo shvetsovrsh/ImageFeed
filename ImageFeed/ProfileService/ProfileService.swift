@@ -13,6 +13,7 @@ final class ProfileService {
     private(set) var profile: Profile?
 
     func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
+        print(Thread.callStackSymbols)
         assert(Thread.isMainThread)
         if lastToken == token {
             return
@@ -23,11 +24,15 @@ final class ProfileService {
         logRequest(request)
         let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
             if let error = error {
-                completion(.failure(error))
+                DispatchQueue.main.async { // Обернуть completion в DispatchQueue.main.async
+                    completion(.failure(error))
+                }
                 return
             }
             guard let data = data else {
-                completion(.failure(ProfileError.emptyResponse))
+                DispatchQueue.main.async { // Обернуть completion в DispatchQueue.main.async
+                    completion(.failure(ProfileError.emptyResponse))
+                }
                 return
             }
             do {
@@ -35,9 +40,13 @@ final class ProfileService {
                 let profileResult = try JSONDecoder().decode(ProfileResult.self, from: data)
                 let profile = Profile(profileResult: profileResult)
                 self?.profile = profile
-                completion(.success(profile))
+                DispatchQueue.main.async { // Обернуть completion в DispatchQueue.main.async
+                    completion(.success(profile))
+                }
             } catch {
-                completion(.failure(error))
+                DispatchQueue.main.async { // Обернуть completion в DispatchQueue.main.async
+                    completion(.failure(error))
+                }
             }
         }
         self.task = task

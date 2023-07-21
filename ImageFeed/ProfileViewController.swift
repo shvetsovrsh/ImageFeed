@@ -28,19 +28,7 @@ final class ProfileViewController: UIViewController {
         setupViews()
         if let profile = profileService.profile {
             self.profile = profile
-        }
-        if let token = tokenStorage.token {
-            profileService.fetchProfile(token) { [weak self] result in
-                switch result {
-                case .success(let profile):
-                    DispatchQueue.main.async {
-                        self?.updateProfileDetails(with: profile)
-                    }
-                case .failure(let error):
-                    print("Failed to fetch profile: \(error)")
-                }
-            }
-
+            updateProfileDetails(with: profile)
         }
     }
 
