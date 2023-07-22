@@ -13,7 +13,6 @@ final class ProfileService {
     private(set) var profile: Profile?
 
     func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
-        print(Thread.callStackSymbols)
         assert(Thread.isMainThread)
         if lastToken == token {
             return
