@@ -13,7 +13,7 @@ final class ProfileViewController: UIViewController {
             loginName: "@ekaterina_nov",
             bio: "Hello, World!"
     )
-
+    private var profileImageServiceObserver: NSObjectProtocol?
     private var nameLabel: UILabel!
     private var loginNameLabel: UILabel!
     private var descriptionLabel: UILabel!
@@ -30,6 +30,30 @@ final class ProfileViewController: UIViewController {
             self.profile = profile
             updateProfileDetails(with: profile)
         }
+
+        profileImageServiceObserver = NotificationCenter.default
+                .addObserver(
+                        forName: ProfileImageService.DidChangeNotification,
+                        object: nil,
+                        queue: .main
+                ) { [weak self] _ in
+                    guard let self = self else {
+                        return
+                    }
+                    self.updateAvatar()
+                }
+        updateAvatar()
+    }
+
+    private func updateAvatar() {
+        guard
+                let profileImageURL = ProfileImageService.shared.avatarURL,
+                let url = URL(string: profileImageURL)
+        else {
+            return
+        }
+        print("updateAvatar to profileImageURL \(url)")
+        // TODO [Sprint 11] Обновить аватар, используя Kingfisher
     }
 
     private func updateProfileDetails(with profile: Profile) {
@@ -38,7 +62,6 @@ final class ProfileViewController: UIViewController {
         loginNameLabel.text = profile.loginName
         descriptionLabel.text = profile.bio
     }
-
 
     private func setupViews() {
         let view = UIView()
