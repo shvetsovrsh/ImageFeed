@@ -3,19 +3,24 @@
 //
 
 import Foundation
+import SwiftKeychainWrapper
 
 protocol TokenStorage {
     var token: String? { get set }
 }
 
 final class OAuth2TokenStorage: TokenStorage {
-    private let userDefaults = UserDefaults.standard
+    private let keychainWrapper = KeychainWrapper.standard
     var token: String? {
         get {
-            userDefaults.string(forKey: "AccessToken")
+            keychainWrapper.string(forKey: "AccessToken")
         }
         set {
-            userDefaults.set(newValue, forKey: "AccessToken")
+            guard let newToken = newValue else {
+                keychainWrapper.removeObject(forKey: "AccessToken")
+                return
+            }
+            keychainWrapper.set(newToken, forKey: "AccessToken")
         }
     }
 }

@@ -87,6 +87,9 @@ extension SplashViewController: AuthViewControllerDelegate {
             case .failure(let error):
                 UIBlockingProgressHUD.dismiss()
                 print("Failed to fetch token: \(error)")
+                let alertController = UIAlertController(title: "Что-то пошло не так", message: "Не удалось войти в систему", preferredStyle: .alert)
+                alertController.addAction(UIAlertAction(title: "Ок", style: .default, handler: nil))
+                self.present(alertController, animated: true, completion: nil)
                 break
             }
         }
@@ -108,6 +111,9 @@ extension SplashViewController: AuthViewControllerDelegate {
             case .failure(let error):
                 UIBlockingProgressHUD.dismiss()
                 print("Failed to fetch profile: \(error)")
+                let alertController = UIAlertController(title: "Что-то пошло не так", message: "Не удалось загрузить профиль", preferredStyle: .alert)
+                alertController.addAction(UIAlertAction(title: "Ок", style: .default, handler: nil))
+                self.present(alertController, animated: true, completion: nil)
                 break
             }
         }

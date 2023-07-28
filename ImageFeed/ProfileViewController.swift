@@ -3,6 +3,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     private let profileService = ProfileService.shared
@@ -17,6 +18,7 @@ final class ProfileViewController: UIViewController {
     private var nameLabel: UILabel!
     private var loginNameLabel: UILabel!
     private var descriptionLabel: UILabel!
+    private let avatarImageView = UIImageView()
 
     @objc
     private func didTapLogoutButton() {
@@ -40,12 +42,12 @@ final class ProfileViewController: UIViewController {
                     guard let self = self else {
                         return
                     }
-                    self.updateAvatar()
+                    self.updateAvatar(imageView: self.avatarImageView)
                 }
-        updateAvatar()
+        updateAvatar(imageView: avatarImageView)
     }
 
-    private func updateAvatar() {
+    private func updateAvatar(imageView: UIImageView) {
         guard
                 let profileImageURL = ProfileImageService.shared.avatarURL,
                 let url = URL(string: profileImageURL)
@@ -53,7 +55,21 @@ final class ProfileViewController: UIViewController {
             return
         }
         print("updateAvatar to profileImageURL \(url)")
-        // TODO [Sprint 11] Обновить аватар, используя Kingfisher
+        let processor = RoundCornerImageProcessor(cornerRadius: 35)
+        imageView.kf.indicatorType = .activity
+        imageView.kf.setImage(with: url,
+                placeholder: UIImage(named: "placeholder.png"),
+                options: [.processor(processor)]) { result in
+
+            switch result {
+            case .success(let value):
+                print(value.image)
+                print(value.cacheType)
+                print(value.source)
+            case .failure(let error):
+                print(error)
+            }
+        }
     }
 
     private func updateProfileDetails(with profile: Profile) {
@@ -69,13 +85,10 @@ final class ProfileViewController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         self.view = view
 
-        let avatarImageView = UIImageView()
         avatarImageView.contentMode = .scaleAspectFit
         avatarImageView.clipsToBounds = true
         avatarImageView.layer.masksToBounds = true
-        avatarImageView.layer.cornerRadius = 35
         avatarImageView.translatesAutoresizingMaskIntoConstraints = false
-        avatarImageView.image = UIImage(named: "avatar")
         view.addSubview(avatarImageView)
 
         nameLabel = UILabel()

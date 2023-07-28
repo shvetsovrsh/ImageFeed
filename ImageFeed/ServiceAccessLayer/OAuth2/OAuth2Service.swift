@@ -50,19 +50,26 @@ final class OAuth2Service {
 }
 
 private extension OAuth2Service {
+//    private func object(
+//            for request: URLRequest,
+//            completion: @escaping (Result<OAuthTokenResponseBody, Error>) -> Void
+//    ) -> URLSessionTask {
+//        let decoder = JSONDecoder()
+//        return urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
+//            let response = result.flatMap { data -> Result<OAuthTokenResponseBody, Error> in
+//                Result {
+//                    try decoder.decode(OAuthTokenResponseBody.self, from: data)
+//                }
+//            }
+//            completion(response)
+//        }
+//    }
+
     private func object(
             for request: URLRequest,
             completion: @escaping (Result<OAuthTokenResponseBody, Error>) -> Void
     ) -> URLSessionTask {
-        let decoder = JSONDecoder()
-        return urlSession.data(for: request) { (result: Result<Data, Error>) in
-            let response = result.flatMap { data -> Result<OAuthTokenResponseBody, Error> in
-                Result {
-                    try decoder.decode(OAuthTokenResponseBody.self, from: data)
-                }
-            }
-            completion(response)
-        }
+        urlSession.objectTask(for: request, completion: completion)
     }
 
     private func authTokenRequest(code: String) -> URLRequest {
@@ -116,11 +123,11 @@ enum NetworkError: Error {
 }
 
 extension URLSession {
-    func data(
+    func objectTask<T: Decodable>(
             for request: URLRequest,
-            completion: @escaping (Result<Data, Error>) -> Void
+            completion: @escaping (Result<T, Error>) -> Void
     ) -> URLSessionTask {
-        let fulfillCompletion: (Result<Data, Error>) -> Void = { result in
+        let fulfillCompletion: (Result<T, Error>) -> Void = { result in
             DispatchQueue.main.async {
                 completion(result)
             }
@@ -130,7 +137,12 @@ extension URLSession {
                let response = response,
                let statusCode = (response as? HTTPURLResponse)?.statusCode {
                 if 200..<300 ~= statusCode {
-                    fulfillCompletion(.success(data))
+                    do {
+                        let decodedObject = try JSONDecoder().decode(T.self, from: data)
+                        fulfillCompletion(.success(decodedObject))
+                    } catch {
+                        fulfillCompletion(.failure(error))
+                    }
                 } else {
                     fulfillCompletion(.failure(NetworkError.httpStatusCode(statusCode)))
                 }

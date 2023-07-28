@@ -21,29 +21,16 @@ final class ProfileService {
         lastToken = token
         let request = profileRequest(token)
         logRequest(request)
-        let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
-            if let error = error {
-                DispatchQueue.main.async { // Обернуть completion в DispatchQueue.main.async
-                    completion(.failure(error))
-                }
-                return
-            }
-            guard let data = data else {
-                DispatchQueue.main.async { // Обернуть completion в DispatchQueue.main.async
-                    completion(.failure(ProfileError.emptyResponse))
-                }
-                return
-            }
-            do {
-                self?.logResponse(data, response: response, error: error)
-                let profileResult = try JSONDecoder().decode(ProfileResult.self, from: data)
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<ProfileResult, Error>) in
+            switch result {
+            case .success(let profileResult):
                 let profile = Profile(profileResult: profileResult)
                 self?.profile = profile
-                DispatchQueue.main.async { // Обернуть completion в DispatchQueue.main.async
+                DispatchQueue.main.async {
                     completion(.success(profile))
                 }
-            } catch {
-                DispatchQueue.main.async { // Обернуть completion в DispatchQueue.main.async
+            case .failure(let error):
+                DispatchQueue.main.async {
                     completion(.failure(error))
                 }
             }
@@ -51,6 +38,46 @@ final class ProfileService {
         self.task = task
         task.resume()
     }
+
+//    func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
+//        assert(Thread.isMainThread)
+//        if lastToken == token {
+//            return
+//        }
+//        task?.cancel()
+//        lastToken = token
+//        let request = profileRequest(token)
+//        logRequest(request)
+//        let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
+//            if let error = error {
+//                DispatchQueue.main.async { // Обернуть completion в DispatchQueue.main.async
+//                    completion(.failure(error))
+//                }
+//                return
+//            }
+//            guard let data = data else {
+//                DispatchQueue.main.async { // Обернуть completion в DispatchQueue.main.async
+//                    completion(.failure(ProfileError.emptyResponse))
+//                }
+//                return
+//            }
+//            do {
+//                self?.logResponse(data, response: response, error: error)
+//                let profileResult = try JSONDecoder().decode(ProfileResult.self, from: data)
+//                let profile = Profile(profileResult: profileResult)
+//                self?.profile = profile
+//                DispatchQueue.main.async { // Обернуть completion в DispatchQueue.main.async
+//                    completion(.success(profile))
+//                }
+//            } catch {
+//                DispatchQueue.main.async { // Обернуть completion в DispatchQueue.main.async
+//                    completion(.failure(error))
+//                }
+//            }
+//        }
+//        self.task = task
+//        task.resume()
+//    }
 
     private func profileRequest(_ token: String) -> URLRequest {
         var request = URLRequest(url: URL(string: "https://api.unsplash.com/me")!)
