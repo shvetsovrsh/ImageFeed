@@ -24,6 +24,7 @@
 		D50B264F29C62C6C0074E2DC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D50B264D29C62C6C0074E2DC /* Main.storyboard */; };
 		D50B265129C62C6E0074E2DC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D50B265029C62C6E0074E2DC /* Assets.xcassets */; };
 		D50B265429C62C6E0074E2DC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D50B265229C62C6E0074E2DC /* LaunchScreen.storyboard */; };
+		D53490D72A75A0E600358FC8 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D53490D62A75A0E600358FC8 /* TabBarController.swift */; };
 		D5AF26B62A73FEBA00A45A4C /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = D5AF26B52A73FEBA00A45A4C /* Kingfisher */; };
 		D5AF26B92A74001500A45A4C /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = D5AF26B82A74001500A45A4C /* SwiftKeychainWrapper */; };
 		D5C5607D2A3DEAE200AC6412 /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = D5C5607C2A3DEAE200AC6412 /* ProgressHUD */; };
@@ -50,6 +51,7 @@
 		D50B265029C62C6E0074E2DC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D50B265329C62C6E0074E2DC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D50B265529C62C6E0074E2DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D53490D62A75A0E600358FC8 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		D5F66D7C2A23929E00B9BB82 /* SingleImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleImageViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -144,6 +146,7 @@
 				36D7D581A1B2CA0F7C8EE652 /* ServiceAccessLayer */,
 				36D7D21664D5A1F1E8841471 /* SplashViewController */,
 				36D7DB652F9152E74AD74F68 /* ProfileService */,
+				D53490D62A75A0E600358FC8 /* TabBarController.swift */,
 			);
 			path = ImageFeed;
 			sourceTree = "<group>";
@@ -247,6 +250,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D50B264829C62C6C0074E2DC /* AppDelegate.swift in Sources */,
+				D53490D72A75A0E600358FC8 /* TabBarController.swift in Sources */,
 				D50B264A29C62C6C0074E2DC /* SceneDelegate.swift in Sources */,
 				36D7D7124555F5796B165322 /* ImagesListViewController.swift in Sources */,
 				36D7DEFBF54F9A95D64AED08 /* ImagesListCell.swift in Sources */,

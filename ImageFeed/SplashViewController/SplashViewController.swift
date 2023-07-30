@@ -16,6 +16,32 @@ final class SplashViewController: UIViewController {
 
     private var userProfile: Profile?
 
+    private let splashScreenLogo = UIImageView()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupViews()
+    }
+
+    private func setupViews() {
+        let view = UIView()
+        view.backgroundColor = UIColor(red: 0.1019607843, green: 0.1058823529, blue: 0.1333333333, alpha: 1)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        self.view = view
+
+        splashScreenLogo.image = UIImage(named: "splash_screen_logo")
+        splashScreenLogo.contentMode = .scaleAspectFit
+        splashScreenLogo.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(splashScreenLogo)
+
+        NSLayoutConstraint.activate([
+            splashScreenLogo.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            splashScreenLogo.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+//            splashScreenLogo.widthAnchor.constraint(equalToConstant: 200),
+//            splashScreenLogo.heightAnchor.constraint(equalToConstant: 200)
+        ])
+    }
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
@@ -23,7 +49,10 @@ final class SplashViewController: UIViewController {
             fetchProfile(token: token)
         } else {
             // Show Auth Screen
-            performSegue(withIdentifier: ShowAuthenticationScreenSegueIdentifier, sender: nil)
+            let authViewController = AuthViewController()
+            authViewController.delegate = self
+            authViewController.modalPresentationStyle = .fullScreen
+            present(authViewController, animated: true, completion: nil)
         }
     }
 
