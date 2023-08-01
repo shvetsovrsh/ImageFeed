@@ -14,46 +14,6 @@ final class ProfileImageService {
     private (set) var avatarURL: String?
     private var lastUsername: String?
 
-//    func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
-//        assert(Thread.isMainThread)
-//        if lastUsername == username {
-//            return
-//        }
-//        guard let token = oauth2TokenStorage.token else {
-//            return
-//        }
-//        task?.cancel()
-//        lastUsername = username
-//        let request = profileImageRequest(token, username)
-//        logRequest(request)
-//        let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
-//            if let error = error {
-//                completion(.failure(error))
-//                return
-//            }
-//            guard let data = data else {
-//                completion(.failure(ProfileError.emptyResponse))
-//                return
-//            }
-//            do {
-//                self?.logResponse(data, response: response, error: error)
-//                let profileImageResult = try JSONDecoder().decode(UserResult.self, from: data)
-//                let profileImage = AvatarImage(profileImage: profileImageResult.profile_image)
-//                self?.avatarURL = profileImage.small.absoluteString
-//                completion(.success(self?.avatarURL ?? ""))
-//                NotificationCenter.default
-//                        .post(
-//                                name: ProfileImageService.DidChangeNotification,
-//                                object: self,
-//                                userInfo: ["URL": self?.avatarURL])
-//            } catch {
-//                completion(.failure(error))
-//            }
-//        }
-//        self.task = task
-//        task.resume()
-//    }
-
     func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
         if lastUsername == username {

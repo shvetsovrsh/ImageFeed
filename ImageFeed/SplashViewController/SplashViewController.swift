@@ -37,8 +37,6 @@ final class SplashViewController: UIViewController {
         NSLayoutConstraint.activate([
             splashScreenLogo.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             splashScreenLogo.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-//            splashScreenLogo.widthAnchor.constraint(equalToConstant: 200),
-//            splashScreenLogo.heightAnchor.constraint(equalToConstant: 200)
         ])
     }
 
@@ -48,11 +46,7 @@ final class SplashViewController: UIViewController {
         if let token = oauth2TokenStorage.token {
             fetchProfile(token: token)
         } else {
-            // Show Auth Screen
-            let authViewController = AuthViewController()
-            authViewController.delegate = self
-            authViewController.modalPresentationStyle = .fullScreen
-            present(authViewController, animated: true, completion: nil)
+            showAuthController()
         }
     }
 
@@ -92,6 +86,18 @@ extension SplashViewController {
 }
 
 extension SplashViewController: AuthViewControllerDelegate {
+
+    private func showAuthController() {
+        let storyboard = UIStoryboard(name: "Main", bundle: .main)
+        let viewController = storyboard.instantiateViewController(withIdentifier: "AuthViewController")
+        guard let authViewController = viewController as? AuthViewController else {
+            return
+        }
+        authViewController.delegate = self
+        authViewController.modalPresentationStyle = .fullScreen
+        present(authViewController, animated: true)
+    }
+
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
         UIBlockingProgressHUD.show()
         dismiss(animated: true) { [weak self] in
