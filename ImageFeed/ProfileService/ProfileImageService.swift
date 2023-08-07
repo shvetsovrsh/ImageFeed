@@ -100,7 +100,7 @@ struct UserResult: Codable {
     let username: String
     let name: String
     let first_name: String
-    let last_name: String
+    let last_name: String?
     let twitter_username: String?
     let portfolio_url: URL?
     let bio: String?
