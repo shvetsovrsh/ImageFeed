@@ -89,18 +89,18 @@ enum ProfileError: Error {
 }
 
 struct ProfileResult: Codable {
-    let id: String
-    let updated_at: String
-    let username: String
-    let name: String
-    let first_name: String
-    let last_name: String
+    let id: String?
+    let updated_at: String?
+    let username: String?
+    let name: String?
+    let first_name: String?
+    let last_name: String?
     let twitter_username: String?
     let portfolio_url: URL?
     let bio: String?
     let location: String?
-    let links: ProfileLinks
-    let profile_image: ProfileImage
+    let links: ProfileLinks?
+    let profile_image: ProfileImage?
     let instagram_username: String?
     let total_collections: Int
     let total_likes: Int
@@ -182,9 +182,9 @@ struct Profile {
     let bio: String
 
     init(profileResult: ProfileResult) {
-        username = profileResult.username
-        name = "\(profileResult.first_name) \(profileResult.last_name)"
-        loginName = "@\(profileResult.username)"
+        username = profileResult.username ?? ""
+        name = "\(profileResult.first_name ?? "") \(profileResult.last_name ?? "")"
+        loginName = "@\(profileResult.username ?? "")"
         bio = profileResult.bio ?? ""
     }
 
