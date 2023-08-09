@@ -5,7 +5,8 @@
 import Foundation
 
 final class OAuth2Service {
-
+    private var task: URLSessionTask?
+    private var lastCode: String?
     static let shared = OAuth2Service()
     private let urlSession = URLSession.shared
     private (set) var authToken: String? {
@@ -19,36 +20,42 @@ final class OAuth2Service {
 
 
     func fetchOAuthToken(_ code: String, completion: @escaping (Result<String, Error>) -> Void) {
+        assert(Thread.isMainThread)
+        if lastCode == code {
+            return
+        }
+        task?.cancel()
+        lastCode = code
         let request = authTokenRequest(code: code)
         let task = object(for: request) { [weak self] result in
-            guard let self = self else {
-                return
-            }
-            switch result {
-            case .success(let body):
-                let authToken = body.accessToken
-                self.authToken = authToken
-                completion(.success(authToken))
-            case .failure(let error):
-                completion(.failure(error))
+            DispatchQueue.main.async {
+                guard let self = self else {
+                    return
+                }
+                switch result {
+                case .success(let body):
+                    let authToken = body.accessToken
+                    self.authToken = authToken
+                    completion(.success(authToken))
+                    self.task = nil
+                case .failure(let error):
+                    completion(.failure(error))
+                    self.lastCode = nil
+                }
             }
         }
+        self.task = task
         task.resume()
     }
 }
 
 private extension OAuth2Service {
+
     private func object(
             for request: URLRequest,
             completion: @escaping (Result<OAuthTokenResponseBody, Error>) -> Void
     ) -> URLSessionTask {
-        let decoder = JSONDecoder()
-        return urlSession.data(for: request) { (result: Result<Data, Error>) in
-            let response = result.flatMap { data -> Result<OAuthTokenResponseBody, Error> in
-                Result { try decoder.decode(OAuthTokenResponseBody.self, from: data) }
-            }
-            completion(response)
-        }
+        urlSession.objectTask(for: request, completion: completion)
     }
 
     private func authTokenRequest(code: String) -> URLRequest {
@@ -102,11 +109,11 @@ enum NetworkError: Error {
 }
 
 extension URLSession {
-    func data(
+    func objectTask<T: Decodable>(
             for request: URLRequest,
-            completion: @escaping (Result<Data, Error>) -> Void
+            completion: @escaping (Result<T, Error>) -> Void
     ) -> URLSessionTask {
-        let fulfillCompletion: (Result<Data, Error>) -> Void = { result in
+        let fulfillCompletion: (Result<T, Error>) -> Void = { result in
             DispatchQueue.main.async {
                 completion(result)
             }
@@ -116,7 +123,12 @@ extension URLSession {
                let response = response,
                let statusCode = (response as? HTTPURLResponse)?.statusCode {
                 if 200..<300 ~= statusCode {
-                    fulfillCompletion(.success(data))
+                    do {
+                        let decodedObject = try JSONDecoder().decode(T.self, from: data)
+                        fulfillCompletion(.success(decodedObject))
+                    } catch {
+                        fulfillCompletion(.failure(error))
+                    }
                 } else {
                     fulfillCompletion(.failure(NetworkError.httpStatusCode(statusCode)))
                 }
