@@ -159,10 +159,6 @@ struct Social: Codable {
     let paypalEmail: String?
 }
 
-struct Photo: Codable {
-
-}
-
 struct Tags: Codable {
     let custom: [String]
     let aggregated: [String]
