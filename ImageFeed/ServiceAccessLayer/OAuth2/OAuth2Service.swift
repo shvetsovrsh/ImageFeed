@@ -109,6 +109,27 @@ enum NetworkError: Error {
 }
 
 extension URLSession {
+    private func logResponse(_ data: Data?, response: URLResponse?, error: Error?) {
+        if let httpResponse = response as? HTTPURLResponse {
+            let statusCode = httpResponse.statusCode
+            print("Response Status Code: \(statusCode)")
+        }
+
+        if let error = error {
+            print("Error: \(error)")
+        }
+
+        if let data = data {
+            if let jsonString = String(data: data, encoding: .utf8) {
+                print("Response JSON: \(jsonString)")
+            } else {
+                print("Failed to convert data to UTF-8 string")
+            }
+        } else {
+            print("Response data is nil")
+        }
+    }
+
     func objectTask<T: Decodable>(
             for request: URLRequest,
             completion: @escaping (Result<T, Error>) -> Void
@@ -118,10 +139,11 @@ extension URLSession {
                 completion(result)
             }
         }
-        let task = dataTask(with: request, completionHandler: { data, response, error in
+        let task = dataTask(with: request, completionHandler: { [self] data, response, error in
             if let data = data,
                let response = response,
                let statusCode = (response as? HTTPURLResponse)?.statusCode {
+                logResponse(data, response: response, error: error)
                 if 200..<300 ~= statusCode {
                     do {
                         let decodedObject = try JSONDecoder().decode(T.self, from: data)

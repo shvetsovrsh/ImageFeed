@@ -108,33 +108,33 @@ struct ProfileResult: Codable {
     let accepted_tos: Bool
     let for_hire: Bool
     let social: Social
-    let followed_by_user: Bool
-    let photos: [Photo]
+    let followed_by_user: Bool?
+    let photos: [Photo]?
     let badge: String?
-    let tags: Tags
-    let followers_count: Int
-    let following_count: Int
-    let allow_messages: Bool
-    let numeric_id: Int
-    let downloads: Int
-    let meta: Meta
-    let uid: String
-    let confirmed: Bool
-    let uploads_remaining: Int
-    let unlimited_uploads: Bool
-    let email: String
-    let dmca_verification: String
-    let unread_in_app_notifications: Bool
-    let unread_highlight_notifications: Bool
+    let tags: Tags?
+    let followers_count: Int?
+    let following_count: Int?
+    let allow_messages: Bool?
+    let numeric_id: Int?
+    let downloads: Int?
+    let meta: Meta?
+    let uid: String?
+    let confirmed: Bool?
+    let uploads_remaining: Int?
+    let unlimited_uploads: Bool?
+    let email: String?
+    let dmca_verification: String?
+    let unread_in_app_notifications: Bool?
+    let unread_highlight_notifications: Bool?
 
     struct ProfileLinks: Codable {
-        let selfURL: URL
-        let html: URL
-        let photos: URL
-        let likes: URL
-        let portfolio: URL
-        let following: URL
-        let followers: URL
+        let selfURL: URL?
+        let html: URL?
+        let photos: URL?
+        let likes: URL?
+        let portfolio: URL?
+        let following: URL?
+        let followers: URL?
 
         private enum CodingKeys: String, CodingKey {
             case selfURL = "self"

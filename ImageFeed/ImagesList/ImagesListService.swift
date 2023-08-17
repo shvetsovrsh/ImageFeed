@@ -6,6 +6,7 @@ import Foundation
 import Kingfisher
 
 final class ImagesListService {
+    private var task: URLSessionTask?
     private let urlSession = URLSession.shared
     private (set) var photos: [Photo] = []
     private let oauth2TokenStorage = OAuth2TokenStorage()
@@ -14,6 +15,7 @@ final class ImagesListService {
     private let dateFormatter = ISO8601DateFormatter()
 
     func fetchPhotosNextPage() {
+        guard task == nil else {return}
         assert(Thread.isMainThread)
         guard let token = oauth2TokenStorage.token else {
             return
@@ -21,16 +23,17 @@ final class ImagesListService {
         let nextPage = lastLoadedPage == nil ? 1 : lastLoadedPage! + 1
         let request = photosRequest(token, nextPage)
 
-        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<[PhotoResult], Error>) in
+        let dataTask = urlSession.objectTask(for: request) { [weak self] (result: Result<[PhotoResult], Error>) in
             switch result {
             case .success(let photoResults):
-                for photoResult in photoResults {
-                    if let newPhoto = self?.createPhoto(photoResult) {
-                        self?.photos.append(newPhoto)
-                    }
-                }
                 DispatchQueue.main.async {
+                    for photoResult in photoResults {
+                        if let newPhoto = self?.createPhoto(photoResult) {
+                            self?.photos.append(newPhoto)
+                        }
+                    }
                     self?.lastLoadedPage = nextPage
+                    self?.task = nil
                     NotificationCenter.default.post(
                             name: ImagesListService.DidChangeNotification,
                             object: nil)
@@ -38,22 +41,29 @@ final class ImagesListService {
             case .failure(let error):
                 DispatchQueue.main.async {
                     print(error)
+                    self?.task = nil
                 }
             }
         }
-        task.resume()
+        task = dataTask
+        task?.resume()
     }
 
     private func photosRequest(_ token: String, _ nextPage: Int) -> URLRequest {
-        var request = URLRequest(url: URL(string: "https://api.unsplash.com/photos")!)
+        let baseUrlString = "https://api.unsplash.com/photos"
+        var urlComponents = URLComponents(string: baseUrlString)!
+        urlComponents.queryItems = [
+            URLQueryItem(name: "page", value: String(nextPage))
+        ]
+        var request = URLRequest(url: urlComponents.url!)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        request.setValue(String(nextPage), forHTTPHeaderField: "page")
+        logRequest(request)
         return request
     }
 
     private func createPhoto(_ photoResult: PhotoResult) -> Photo {
-        let createdAt = photoResult.createdAt ?? ""
+        let createdAt = photoResult.created_at ?? ""
         return Photo(
                 id: photoResult.id,
                 size: CGSize(width: photoResult.width, height: photoResult.height),
@@ -61,8 +71,23 @@ final class ImagesListService {
                 welcomeDescription: photoResult.description,
                 thumbImageURL: photoResult.urls.thumb,
                 largeImageURL: photoResult.urls.full,
-                isLiked: photoResult.likedByUser
+                isLiked: photoResult.liked_by_user
         )
+    }
+
+    private func logRequest(_ request: URLRequest) {
+        if let httpMethod = request.httpMethod, let url = request.url {
+            print("Request: \(httpMethod) \(url)")
+            if let headers = request.allHTTPHeaderFields {
+                print("Headers:")
+                for (key, value) in headers {
+                    print("\(key): \(value)")
+                }
+            }
+            if let bodyData = request.httpBody, let bodyString = String(data: bodyData, encoding: .utf8) {
+                print("Body: \(bodyString)")
+            }
+        }
     }
 }
 
@@ -75,42 +100,44 @@ struct UrlsResult: Codable {
 }
 
 struct UserLinksResult: Codable {
-    let selfLink: String
+    let `self`: String
     let html: String
-    let photos: String
+    let photos: String?
     let likes: String
     let portfolio: String
+    let following: String
+    let followers: String
 }
 
 struct CollectionResult: Codable {
     let id: Int
     let title: String
-    let publishedAt: String
-    let lastCollectedAt: String
-    let updatedAt: String
+    let published_at: String
+    let lastCollected_at: String
+    let updated_at: String
     let coverPhoto: String?
-    let user: String?
+    let user: UserResult?
 }
 
 struct PhotoResult: Codable {
     let id: String
-    let createdAt: String
-    let updatedSt: String
+    let created_at: String
+    let updated_at: String
     let width: Int
     let height: Int
     let color: String
-    let blurHash: String
+    let blur_hash: String
     let likes: Int
-    let likedByUser: Bool
+    let liked_by_user: Bool
     let description: String?
     let user: UserResult
-    let currentUserCollections: [CollectionResult]
+    let current_user_collections: [CollectionResult]
     let urls: UrlsResult
     let links: PhotoLinksResult
 }
 
 struct PhotoLinksResult: Codable {
-    let selfLink: String
+    let `self`: String
     let html: String
     let download: String
     let download_location: String
