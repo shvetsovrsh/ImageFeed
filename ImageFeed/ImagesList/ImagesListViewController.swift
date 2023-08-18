@@ -8,6 +8,8 @@
 import UIKit
 
 class ImagesListViewController: UIViewController {
+    var photos: [Photo] = []
+    private let imagesListService = ImagesListService()
 
     private let ShowSingleImageSegueIdentifier = "ShowSingleImage"
 
@@ -20,6 +22,17 @@ class ImagesListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
+        fetchPhotos()
+    }
+
+    private func fetchPhotos() {
+        imagesListService.fetchPhotosNextPage()
+        photos = imagesListService.photos
+        tableView.reloadData()
+    }
+
+    @objc private func handlePhotosChangeNotification() {
+        fetchPhotos()
     }
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

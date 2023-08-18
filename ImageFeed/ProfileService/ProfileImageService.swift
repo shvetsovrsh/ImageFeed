@@ -27,17 +27,19 @@ final class ProfileImageService {
         let request = profileImageRequest(token, username)
         logRequest(request)
 
-        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<UserResult, Error>) in
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<ProfileResult, Error>) in
             switch result {
             case .success(let profileImageResult):
-                let profileImage = AvatarImage(profileImage: profileImageResult.profile_image)
-                self?.avatarURL = profileImage.medium.absoluteString
-                DispatchQueue.main.async {
-                    completion(.success(self?.avatarURL ?? ""))
-                    NotificationCenter.default.post(
-                            name: ProfileImageService.DidChangeNotification,
-                            object: self,
-                            userInfo: ["URL": self?.avatarURL])
+                if let profileImage = profileImageResult.profile_image {
+                    let avatarImage = AvatarImage(profileImage: profileImage)
+                    self?.avatarURL = avatarImage.medium?.absoluteString
+                    DispatchQueue.main.async {
+                        completion(.success(self?.avatarURL ?? ""))
+                        NotificationCenter.default.post(
+                                name: ProfileImageService.DidChangeNotification,
+                                object: self,
+                                userInfo: ["URL": self?.avatarURL])
+                    }
                 }
             case .failure(let error):
                 DispatchQueue.main.async {
@@ -69,113 +71,5 @@ final class ProfileImageService {
                 print("Body: \(bodyString)")
             }
         }
-    }
-
-    private func logResponse(_ data: Data?, response: URLResponse?, error: Error?) {
-        if let httpResponse = response as? HTTPURLResponse {
-            let statusCode = httpResponse.statusCode
-            print("Response Status Code: \(statusCode)")
-        }
-
-        if let error = error {
-            print("Error: \(error)")
-        }
-
-        if let data = data {
-            if let jsonString = String(data: data, encoding: .utf8) {
-                print("Response JSON: \(jsonString)")
-            } else {
-                print("Failed to convert data to UTF-8 string")
-            }
-        } else {
-            print("Response data is nil")
-        }
-    }
-
-}
-
-struct UserResult: Codable {
-    let id: String
-    let updated_at: String
-    let username: String
-    let name: String
-    let first_name: String
-    let last_name: String?
-    let twitter_username: String?
-    let portfolio_url: URL?
-    let bio: String?
-    let location: String?
-    let links: ProfileLinks
-    let profile_image: ProfileImage
-    let instagram_username: String?
-    let total_collections: Int
-    let total_likes: Int
-    let total_photos: Int
-    let accepted_tos: Bool
-    let for_hire: Bool
-    let social: Social
-    let followed_by_user: Bool
-    let photos: [Photo]
-    let badge: String?
-    let tags: Tags
-    let followers_count: Int
-    let following_count: Int
-    let allow_messages: Bool
-    let numeric_id: Int
-    let downloads: Int
-    let meta: Meta
-}
-
-struct ProfileLinks: Codable {
-    let selfURL: URL
-    let html: URL
-    let photos: URL
-    let likes: URL
-    let portfolio: URL
-    let following: URL
-    let followers: URL
-
-    private enum CodingKeys: String, CodingKey {
-        case selfURL = "self"
-        case html
-        case photos
-        case likes
-        case portfolio
-        case following
-        case followers
-    }
-}
-
-struct ProfileImage: Codable {
-    let small: URL
-    let medium: URL
-    let large: URL
-}
-
-struct Social: Codable {
-    let instagramUsername: String?
-    let portfolioURL: URL?
-    let twitterUsername: String?
-    let paypalEmail: String?
-}
-
-struct Tags: Codable {
-    let custom: [String]
-    let aggregated: [String]
-}
-
-struct Meta: Codable {
-    let index: Bool
-}
-
-struct AvatarImage {
-    let small: URL
-    let medium: URL
-    let large: URL
-
-    init(profileImage: ProfileImage) {
-        small = profileImage.small
-        medium = profileImage.medium
-        large = profileImage.large
     }
 }
