@@ -57,6 +57,50 @@ final class ImagesListService {
         return request
     }
 
+    func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void) {
+        assert(Thread.isMainThread)
+        guard let token = oauth2TokenStorage.token else {
+            return
+        }
+        let request = likeRequest(token, photoId, isLike)
+        logRequest(request)
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<[LikeResult], Error>) in
+            guard let self = self else {return}
+            switch result {
+            case .success(let photoResults):
+                DispatchQueue.main.async {
+                    if let index = self.photos.firstIndex(where: { $0.id == photoId }) {
+                        let photo = self.photos[index]
+                        let newPhoto = Photo(
+                                id: photo.id,
+                                size: photo.size,
+                                createdAt: photo.createdAt,
+                                welcomeDescription: photo.welcomeDescription,
+                                thumbImageURL: photo.thumbImageURL,
+                                largeImageURL: photo.largeImageURL,
+                                isLiked: !photo.isLiked
+                        )
+                        self.photos[index] = newPhoto
+                    }
+                }
+            case .failure(let error):
+                print("changeLike error: \(error)")
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+        }
+        task.resume()
+    }
+
+    private func likeRequest(_ token: String, _ photoId: String, _ isLike: Bool) -> URLRequest {
+        var urlComponents = URLComponents(string: "https://api.unsplash.com/photos/\(photoId)/like")!
+        var request = URLRequest(url: urlComponents.url!)
+        request.httpMethod = isLike ? "POST" : "DELETE"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        logRequest(request)
+        return request
+    }
 
     private func createPhoto(_ photoResult: PhotoResult) -> Photo {
         let createdAt = photoResult.created_at ?? ""

@@ -9,6 +9,11 @@ public enum ProfileError: Error {
     case emptyResponse
 }
 
+public struct LikeResult: Codable {
+    let photo: PhotoResult
+    let user: ProfileResult
+}
+
 public struct Photo: Codable {
     let id: String
     let size: CGSize
