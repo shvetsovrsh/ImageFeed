@@ -3,12 +3,14 @@
 //
 
 import Foundation
+import WebKit
 
 final class ProfileService {
     static let shared = ProfileService()
     private var task: URLSessionTask?
     private let urlSession = URLSession.shared
     private var lastToken: String?
+    private let oauth2TokenStorage = OAuth2TokenStorage()
 
     private(set) var profile: Profile?
 
@@ -44,6 +46,20 @@ final class ProfileService {
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         return request
+    }
+
+    static func clean() {
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+        WKWebsiteDataStore.default().fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+            records.forEach { record in
+                WKWebsiteDataStore.default().removeData(ofTypes: record.dataTypes, for: [record], completionHandler: {})
+            }
+        }
+    }
+
+    func logout() {
+        oauth2TokenStorage.token = nil
+        ProfileService.clean()
     }
 
     private func logRequest(_ request: URLRequest) {
