@@ -27,7 +27,6 @@
 		D50B265129C62C6E0074E2DC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D50B265029C62C6E0074E2DC /* Assets.xcassets */; };
 		D50B265429C62C6E0074E2DC /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D50B265229C62C6E0074E2DC /* LaunchScreen.storyboard */; };
 		D53490D72A75A0E600358FC8 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D53490D62A75A0E600358FC8 /* TabBarController.swift */; };
-		D57836242A8E2AF800304095 /* ImagesListServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D57836232A8E2AF800304095 /* ImagesListServiceTests.swift */; };
 		D5AF26B62A73FEBA00A45A4C /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = D5AF26B52A73FEBA00A45A4C /* Kingfisher */; };
 		D5AF26B92A74001500A45A4C /* SwiftKeychainWrapper in Frameworks */ = {isa = PBXBuildFile; productRef = D5AF26B82A74001500A45A4C /* SwiftKeychainWrapper */; };
 		D5C5607D2A3DEAE200AC6412 /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = D5C5607C2A3DEAE200AC6412 /* ProgressHUD */; };
@@ -68,7 +67,6 @@
 		D50B265529C62C6E0074E2DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D53490D62A75A0E600358FC8 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		D57836212A8E2AF800304095 /* ImageFeedTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ImageFeedTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D57836232A8E2AF800304095 /* ImagesListServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListServiceTests.swift; sourceTree = "<group>"; };
 		D5F66D7C2A23929E00B9BB82 /* SingleImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SingleImageViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -149,7 +147,6 @@
 			isa = PBXGroup;
 			children = (
 				D50B264629C62C6C0074E2DC /* ImageFeed */,
-				D57836222A8E2AF800304095 /* ImageFeedTests */,
 				D50B264529C62C6C0074E2DC /* Products */,
 			);
 			sourceTree = "<group>";
@@ -184,14 +181,6 @@
 				36D7D4873002361A517F6078 /* Models */,
 			);
 			path = ImageFeed;
-			sourceTree = "<group>";
-		};
-		D57836222A8E2AF800304095 /* ImageFeedTests */ = {
-			isa = PBXGroup;
-			children = (
-				D57836232A8E2AF800304095 /* ImagesListServiceTests.swift */,
-			);
-			path = ImageFeedTests;
 			sourceTree = "<group>";
 		};
 		D592C07329E1E9A600ECF378 /* ImagesList */ = {
@@ -348,7 +337,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D57836242A8E2AF800304095 /* ImagesListServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

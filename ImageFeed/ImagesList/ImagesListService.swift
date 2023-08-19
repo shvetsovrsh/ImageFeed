@@ -64,7 +64,7 @@ final class ImagesListService {
         }
         let request = likeRequest(token, photoId, isLike)
         logRequest(request)
-        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<[LikeResult], Error>) in
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<LikeResult, Error>) in
             guard let self = self else {return}
             switch result {
             case .success(let photoResults):
@@ -81,6 +81,7 @@ final class ImagesListService {
                                 isLiked: !photo.isLiked
                         )
                         self.photos[index] = newPhoto
+                        completion(.success(()))
                     }
                 }
             case .failure(let error):
