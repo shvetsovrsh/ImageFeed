@@ -45,13 +45,18 @@ final class ImagesListService {
     }
 
     private func photosRequest(_ token: String, _ nextPage: Int) -> URLRequest {
-        var request = URLRequest(url: URL(string: "https://api.unsplash.com/photos")!)
+        var urlComponents = URLComponents(string: "https://api.unsplash.com/photos")!
+        urlComponents.queryItems = [
+            URLQueryItem(name: "page", value: String(nextPage))
+        ]
+
+        var request = URLRequest(url: urlComponents.url!)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        request.setValue(String(nextPage), forHTTPHeaderField: "page")
         logRequest(request)
         return request
     }
+
 
     private func createPhoto(_ photoResult: PhotoResult) -> Photo {
         let createdAt = photoResult.created_at ?? ""
