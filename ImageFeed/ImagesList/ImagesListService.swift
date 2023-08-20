@@ -12,16 +12,35 @@ final class ImagesListService {
     static let DidChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
     private var lastLoadedPage: Int?
     private let dateFormatter = ISO8601DateFormatter()
+    private var isFetching = false
+    private var task: URLSessionTask?
+
 
     func fetchPhotosNextPage() {
         assert(Thread.isMainThread)
+        guard task == nil else {
+            print("Fetching in progress. Cannot start a new request.")
+            return
+        }
+
+        if isFetching {
+            print("Fetching in progress. Cannot start a new request.")
+            return
+        }
+
+        isFetching = true
+
         guard let token = oauth2TokenStorage.token else {
             return
         }
         let nextPage = lastLoadedPage == nil ? 1 : lastLoadedPage! + 1
         let request = photosRequest(token, nextPage)
 
-        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<[PhotoResult], Error>) in
+        let dataTask = urlSession.objectTask(for: request) { [weak self] (result: Result<[PhotoResult], Error>) in
+            defer {
+                self?.isFetching = false
+                self?.task = nil
+            }
             switch result {
             case .success(let photoResults):
                 DispatchQueue.main.async {
@@ -41,7 +60,8 @@ final class ImagesListService {
                 }
             }
         }
-        task.resume()
+        task = dataTask
+        task?.resume()
     }
 
     private func photosRequest(_ token: String, _ nextPage: Int) -> URLRequest {
@@ -65,7 +85,9 @@ final class ImagesListService {
         let request = likeRequest(token, photoId, isLike)
         logRequest(request)
         let task = urlSession.objectTask(for: request) { [weak self] (result: Result<LikeResult, Error>) in
-            guard let self = self else {return}
+            guard let self = self else {
+                return
+            }
             switch result {
             case .success(let photoResults):
                 DispatchQueue.main.async {
