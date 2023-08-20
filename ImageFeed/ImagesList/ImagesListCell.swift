@@ -3,6 +3,7 @@
 //
 
 import UIKit
+import Kingfisher
 
 protocol ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell)
@@ -11,8 +12,15 @@ protocol ImagesListCellDelegate {
 final class ImagesListCell: UITableViewCell {
     static let reuseIdentifier = "ImagesListCell"
     @IBOutlet var cellImage: UIImageView!
-    @IBOutlet var likeButton: UIButton!
-    @IBOutlet var dateLabel: UILabel!
+    @IBOutlet private var likeButton: UIButton!
+    @IBOutlet private var dateLabel: UILabel!
+
+    private lazy var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        formatter.timeStyle = .none
+        return formatter
+    }()
 
     var delegate: ImagesListCellDelegate?
 
@@ -36,12 +44,8 @@ final class ImagesListCell: UITableViewCell {
         }
     }
 
-    private lazy var dateFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .long
-        formatter.timeStyle = .none
-        return formatter
-    }()
+    private func configCell(for cell: ImagesListCell) {
+    }
 
     @objc private func handleLikeButtonClick() {
         delegate?.imageListCellDidTapLike(self)

@@ -30,7 +30,7 @@ final class ProfileImageService {
         let task = urlSession.objectTask(for: request) { [weak self] (result: Result<ProfileResult, Error>) in
             switch result {
             case .success(let profileImageResult):
-                if let profileImage = profileImageResult.profile_image {
+                if let profileImage = profileImageResult.profileImage {
                     let avatarImage = AvatarImage(profileImage: profileImage)
                     self?.avatarURL = avatarImage.medium?.absoluteString
                     DispatchQueue.main.async {

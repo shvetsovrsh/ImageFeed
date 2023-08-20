@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ImagesListViewController: UIViewController {
+final class ImagesListViewController: UIViewController {
     var photos: [Photo] = []
     private let imagesListService = ImagesListService()
 
@@ -23,7 +23,8 @@ class ImagesListViewController: UIViewController {
         NotificationCenter.default.addObserver(
                 forName: ImagesListService.DidChangeNotification,
                 object: nil,
-                queue: .main) { [weak self] _ in
+                queue: .main
+        ) { [weak self] _ in
             guard let self else {
                 return
             }
@@ -65,12 +66,30 @@ class ImagesListViewController: UIViewController {
                     IndexPath(row: i, section: 0)
                 }
                 tableView.insertRows(at: indexPaths, with: .automatic)
-            } completion: { _ in
             }
         }
     }
 
-    func configCell(for cell: ImagesListCell) {
+    private func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
+        let photo = photos[indexPath.row]
+
+        if let thumbImageURL = URL(string: photo.thumbImageURL) {
+            cell.cellImage.kf.indicatorType = .activity
+            cell.cellImage.kf.setImage(with: thumbImageURL, placeholder: UIImage(named: "placeholder_image")) { [weak self] result in
+                guard let self = self else {
+                    return
+                }
+                switch result {
+                case .success:
+                    cell.setIsLiked(self.photos[indexPath.row].isLiked)
+                    cell.setDate(photo.createdAt)
+                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                case .failure:
+                    cell.cellImage.image = UIImage(named: "placeholder_image")
+                    cell.setIsLiked(indexPath.row % 2 == 0)
+                }
+            }
+        }
     }
 }
 
@@ -87,30 +106,6 @@ extension ImagesListViewController: UITableViewDataSource {
         imageListCell.delegate = self
         configCell(for: imageListCell, with: indexPath)
         return imageListCell
-    }
-}
-
-extension ImagesListViewController {
-    func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        let photo = photos[indexPath.row]
-
-        if let thumbImageURL = URL(string: photo.thumbImageURL) {
-            cell.cellImage.kf.indicatorType = .activity
-            cell.cellImage.kf.setImage(with: thumbImageURL, placeholder: UIImage(named: "placeholder_image")) { [weak self] result in
-                guard let self = self else {
-                    return
-                }
-                switch result {
-                case .success(let image):
-                    cell.setIsLiked(self.photos[indexPath.row].isLiked)
-                    cell.setDate(photo.createdAt)
-                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
-                case .failure(_):
-                    cell.cellImage.image = UIImage(named: "placeholder_image")
-                    cell.setIsLiked(indexPath.row % 2 == 0)
-                }
-            }
-        }
     }
 }
 

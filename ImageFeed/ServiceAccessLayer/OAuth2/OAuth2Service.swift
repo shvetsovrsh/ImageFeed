@@ -145,7 +145,9 @@ extension URLSession {
                 logResponse(data, response: response, error: error)
                 if 200..<300 ~= statusCode {
                     do {
-                        let decodedObject = try JSONDecoder().decode(T.self, from: data)
+                        let decoder = JSONDecoder()
+                        decoder.keyDecodingStrategy = .convertFromSnakeCase
+                        let decodedObject = try decoder.decode(T.self, from: data)
                         fulfillCompletion(.success(decodedObject))
                     } catch {
                         fulfillCompletion(.failure(error))

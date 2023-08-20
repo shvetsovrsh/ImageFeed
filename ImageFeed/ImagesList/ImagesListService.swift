@@ -3,7 +3,6 @@
 //
 
 import Foundation
-import Kingfisher
 
 final class ImagesListService {
     private let urlSession = URLSession.shared
@@ -41,9 +40,9 @@ final class ImagesListService {
                 self?.isFetching = false
                 self?.task = nil
             }
-            switch result {
-            case .success(let photoResults):
-                DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let photoResults):
                     for photoResult in photoResults {
                         if let newPhoto = self?.createPhoto(photoResult) {
                             self?.photos.append(newPhoto)
@@ -53,9 +52,8 @@ final class ImagesListService {
                     NotificationCenter.default.post(
                             name: ImagesListService.DidChangeNotification,
                             object: nil)
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
+
+                case .failure(let error):
                     print(error)
                 }
             }
@@ -89,7 +87,7 @@ final class ImagesListService {
                 return
             }
             switch result {
-            case .success(let photoResults):
+            case .success:
                 DispatchQueue.main.async {
                     if let index = self.photos.firstIndex(where: { $0.id == photoId }) {
                         let photo = self.photos[index]
@@ -117,7 +115,7 @@ final class ImagesListService {
     }
 
     private func likeRequest(_ token: String, _ photoId: String, _ isLike: Bool) -> URLRequest {
-        var urlComponents = URLComponents(string: "https://api.unsplash.com/photos/\(photoId)/like")!
+        let urlComponents = URLComponents(string: "https://api.unsplash.com/photos/\(photoId)/like")!
         var request = URLRequest(url: urlComponents.url!)
         request.httpMethod = isLike ? "POST" : "DELETE"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -126,7 +124,7 @@ final class ImagesListService {
     }
 
     private func createPhoto(_ photoResult: PhotoResult) -> Photo {
-        let createdAt = photoResult.created_at ?? ""
+        let createdAt = photoResult.createdAt ?? ""
         return Photo(
                 id: photoResult.id,
                 size: CGSize(width: photoResult.width, height: photoResult.height),
@@ -134,7 +132,7 @@ final class ImagesListService {
                 welcomeDescription: photoResult.description,
                 thumbImageURL: photoResult.urls.thumb,
                 largeImageURL: photoResult.urls.full,
-                isLiked: photoResult.liked_by_user
+                isLiked: photoResult.likedByUser
         )
     }
 

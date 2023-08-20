@@ -50,7 +50,7 @@ public struct Profile {
 
     init(profileResult: ProfileResult) {
         username = profileResult.username ?? ""
-        name = "\(profileResult.first_name ?? "") \(profileResult.last_name ?? "")"
+        name = "\(profileResult.firstName ?? "") \(profileResult.lastName ?? "")"
         loginName = "@\(profileResult.username ?? "")"
         bio = profileResult.bio ?? ""
     }
@@ -82,26 +82,26 @@ public struct UserLinksResult: Codable {
 public struct CollectionResult: Codable {
     let id: Int?
     let title: String?
-    let published_at: String?
-    let last_collected_at: String?
-    let updated_at: String?
-    let cover_photo: String?
+    let publishedAt: String?
+    let lastCollectedAt: String?
+    let updatedAt: String?
+    let coverPhoto: String?
     let user: String?
 }
 
 public struct PhotoResult: Codable {
     let id: String
-    let created_at: String
-    let updated_at: String
+    let createdAt: String?
+    let updatedAt: String
     let width: Int
     let height: Int
     let color: String
-    let blur_hash: String
+    let blurHash: String
     let likes: Int
-    let liked_by_user: Bool
+    let likedByUser: Bool
     let description: String?
     let user: ProfileResult
-    let current_user_collections: [CollectionResult]
+    let currentUserCollections: [CollectionResult]
     let urls: UrlsResult
     let links: PhotoLinksResult
 }
@@ -110,47 +110,47 @@ public struct PhotoLinksResult: Codable {
     let `self`: String?
     let html: String?
     let download: String?
-    let download_location: String?
+    let downloadLocation: String?
 }
 
 public struct ProfileResult: Codable {
     let id: String?
-    let updated_at: String?
+    let updatedAt: String?
     let username: String?
     let name: String?
-    let first_name: String?
-    let last_name: String?
-    let twitter_username: String?
-    let portfolio_url: URL?
+    let firstName: String?
+    let lastName: String?
+    let twitterUsername: String?
+    let portfolioUrl: URL?
     let bio: String?
     let location: String?
     let links: ProfileLinks?
-    let profile_image: ProfileImage?
-    let instagram_username: String?
-    let total_collections: Int?
-    let total_likes: Int?
-    let total_photos: Int?
-    let accepted_tos: Bool?
-    let for_hire: Bool?
+    let profileImage: ProfileImage?
+    let instagramUsername: String?
+    let totalCollections: Int?
+    let totalLikes: Int?
+    let totalPhotos: Int?
+    let acceptedTos: Bool?
+    let forHire: Bool?
     let social: Social?
-    let followed_by_user: Bool?
+    let followedByUser: Bool?
     let photos: [Photo]?
     let badge: String?
     let tags: Tags?
-    let followers_count: Int?
-    let following_count: Int?
-    let allow_messages: Bool?
-    let numeric_id: Int?
+    let followersCount: Int?
+    let followingCount: Int?
+    let allowMessages: Bool?
+    let numericId: Int?
     let downloads: Int?
     let meta: Meta?
     let uid: String?
     let confirmed: Bool?
-    let uploads_remaining: Int?
-    let unlimited_uploads: Bool?
+    let uploadsRemaining: Int?
+    let unlimitedUploads: Bool?
     let email: String?
-    let dmca_verification: String?
-    let unread_in_app_notifications: Bool?
-    let unread_highlight_notifications: Bool?
+    let dmcaVerification: String?
+    let unreadInAppNotifications: Bool?
+    let unreadHighlightNotifications: Bool?
 
     struct ProfileLinks: Codable {
         let `self`: URL?
@@ -163,10 +163,10 @@ public struct ProfileResult: Codable {
     }
 
     struct Social: Codable {
-        let instagram_username: String?
-        let portfolio_uRL: URL?
-        let twitter_username: String?
-        let paypal_email: String?
+        let instagramUsername: String?
+        let portfolioURL: URL?
+        let twitterUsername: String?
+        let paypalEmail: String?
     }
 
     struct Tags: Codable {
