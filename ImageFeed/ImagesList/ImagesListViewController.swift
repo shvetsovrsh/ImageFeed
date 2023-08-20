@@ -41,19 +41,19 @@ class ImagesListViewController: UIViewController {
         fetchPhotos()
     }
 
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 
-//        if segue.identifier == ShowSingleImageSegueIdentifier,
-//           let viewController = segue.destination as? SingleImageViewController,
-//           let indexPath = sender as? IndexPath {
-//            let photo = photos[indexPath.row]
-//            if let image = UIImage(named: "\(photo.id)_full_size") ?? UIImage(named: photo.id) {
-//                viewController.image = image
-//            }
-//        } else {
-//            super.prepare(for: segue, sender: sender)
-//        }
-//    }
+        if segue.identifier == ShowSingleImageSegueIdentifier,
+           let viewController = segue.destination as? SingleImageViewController,
+           let indexPath = sender as? IndexPath {
+            let photo = photos[indexPath.row]
+            let imageUrl = photo.largeImageURL
+
+            viewController.imageUrl = imageUrl
+        } else {
+            super.prepare(for: segue, sender: sender)
+        }
+    }
 
     private func updateTableViewAnimated() {
         let oldCount = photos.count
