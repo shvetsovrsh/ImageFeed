@@ -11,7 +11,6 @@ final class ImagesListService {
     static let DidChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
     private var lastLoadedPage: Int?
     private let dateFormatter = ISO8601DateFormatter()
-    private var isFetching = false
     private var task: URLSessionTask?
 
 
@@ -21,14 +20,6 @@ final class ImagesListService {
             print("Fetching in progress. Cannot start a new request.")
             return
         }
-
-        if isFetching {
-            print("Fetching in progress. Cannot start a new request.")
-            return
-        }
-
-        isFetching = true
-
         guard let token = oauth2TokenStorage.token else {
             return
         }
@@ -37,7 +28,6 @@ final class ImagesListService {
 
         let dataTask = urlSession.objectTask(for: request) { [weak self] (result: Result<[PhotoResult], Error>) in
             defer {
-                self?.isFetching = false
                 self?.task = nil
             }
             DispatchQueue.main.async {
