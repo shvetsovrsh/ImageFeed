@@ -5,20 +5,27 @@
 import UIKit
 import Kingfisher
 
-final class ProfileViewController: UIViewController {
+protocol ProfileViewControllerProtocol: AnyObject {
+    var presenter: ProfilePresenterProtocol? { get }
+    func updateProfileDetails(profile: Profile)
+    func showAuthController()
+    var avatarImageView: UIImageView { get }
+    func updateProfileAvatar(avatar: UIImage)
+    func startListeningForProfileImageChanges(completion: @escaping () -> Void)
+}
+
+final class ProfileViewController: UIViewController & ProfileViewControllerProtocol {
+    var presenter: ProfilePresenterProtocol?
+
     private let profileService = ProfileService.shared
     private let tokenStorage = OAuth2TokenStorage()
-    private var profile: Profile = Profile(
-            username: "ekaterina_nov",
-            name: "Екатерина Новикова",
-            loginName: "@ekaterina_nov",
-            bio: "Hello, World!"
-    )
+    private let profileHelper = ProfileHelper()
+    private var profile: Profile = .standard
     private var profileImageServiceObserver: NSObjectProtocol?
     private var nameLabel: UILabel!
     private var loginNameLabel: UILabel!
     private var descriptionLabel: UILabel!
-    private var avatarImageView = UIImageView()
+    internal var avatarImageView = UIImageView()
     private var logoutButton: UIButton!
 
     @objc
@@ -26,28 +33,25 @@ final class ProfileViewController: UIViewController {
         showAlertViewController()
     }
 
+    func updateProfileDetails(profile: Profile) {
+        self.profile = profile
+        nameLabel.text = profile.name
+        loginNameLabel.text = profile.loginName
+        descriptionLabel.text = profile.bio
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
-
         setupViews()
+        presenter = ProfilePresenter(profileService: profileService, profileHelper: profileHelper)
+        presenter?.view = self
+        presenter?.viewDidLoad()
+    }
 
-        if let profile = profileService.profile {
-            self.profile = profile
-            updateProfileDetails(with: profile)
+    func startListeningForProfileImageChanges(completion: @escaping () -> Void) {
+        NotificationCenter.default.addObserver(forName: ProfileImageService.DidChangeNotification, object: nil, queue: .main) { [weak self] _ in
+            completion()
         }
-
-        profileImageServiceObserver = NotificationCenter.default
-                .addObserver(
-                        forName: ProfileImageService.DidChangeNotification,
-                        object: nil,
-                        queue: .main
-                ) { [weak self] _ in
-                    guard let self = self else {
-                        return
-                    }
-                    self.updateAvatar(imageView: self.avatarImageView)
-                }
-        updateAvatar(imageView: avatarImageView)
     }
 
     private func setupViews() {
@@ -128,36 +132,8 @@ final class ProfileViewController: UIViewController {
         self.logoutButton = logoutButton
     }
 
-    private func updateAvatar(imageView: UIImageView) {
-        guard
-                let profileImageURL = ProfileImageService.shared.avatarURL,
-                let url = URL(string: profileImageURL)
-        else {
-            return
-        }
-        print("updateAvatar to profileImageURL \(url)")
-        let processor = RoundCornerImageProcessor(cornerRadius: 35)
-        imageView.kf.indicatorType = .activity
-        imageView.kf.setImage(with: url,
-                placeholder: UIImage(named: "placeholder.png"),
-                options: [.processor(processor)]) { result in
-
-            switch result {
-            case .success(let value):
-                print(value.image)
-                print(value.cacheType)
-                print(value.source)
-            case .failure(let error):
-                print(error)
-            }
-        }
-    }
-
-    private func updateProfileDetails(with profile: Profile) {
-        self.profile = profile
-        nameLabel.text = profile.name
-        loginNameLabel.text = profile.loginName
-        descriptionLabel.text = profile.bio
+    internal func updateProfileAvatar(avatar: UIImage) {
+        avatarImageView.image = avatar
     }
 
     private func showAlertViewController() {
@@ -174,7 +150,7 @@ final class ProfileViewController: UIViewController {
         present(alertController, animated: true, completion: nil)
     }
 
-    private func showAuthController() {
+    internal func showAuthController() {
         let storyboard = UIStoryboard(name: "Main", bundle: .main)
         let viewController = storyboard.instantiateViewController(withIdentifier: "AuthViewController")
         guard let authViewController = viewController as? AuthViewController else {
