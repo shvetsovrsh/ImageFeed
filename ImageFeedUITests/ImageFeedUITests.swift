@@ -18,7 +18,6 @@ final class ImageFeedUITests: XCTestCase {
     func testAuth() throws {
 
         app.buttons["Authenticate"].tap()
-
         let webView = app.webViews["UnsplashWebView"]
 
         XCTAssertTrue(webView.waitForExistence(timeout: 5))
