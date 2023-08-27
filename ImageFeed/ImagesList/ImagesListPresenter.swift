@@ -4,8 +4,8 @@
 
 import UIKit
 
-protocol ImagesListPresenterProtocol: AnyObject {
-    var photos: [Photo] {get}
+public protocol ImagesListPresenterProtocol: AnyObject {
+    var photos: [Photo] { get }
     var view: ImagesListViewControllerProtocol? { get set }
     func fetchPhotosNextPage()
     func updateTableView()
@@ -15,9 +15,11 @@ protocol ImagesListPresenterProtocol: AnyObject {
 class ImagesListPresenter: ImagesListPresenterProtocol {
     private (set) var photos: [Photo] = []
     var view: ImagesListViewControllerProtocol?
-    private let imagesListService = ImagesListService()
+    private let imagesListService: ImagesListServiceProtocol
 
-    init(viewController: ImagesListViewControllerProtocol) {
+    init(viewController: ImagesListViewControllerProtocol,
+         imagesListService: ImagesListServiceProtocol) {
+        self.imagesListService = imagesListService
         view = viewController
         setupImagesListServiceObserver()
     }
@@ -30,7 +32,7 @@ class ImagesListPresenter: ImagesListPresenterProtocol {
         NotificationCenter.default.addObserver(
                 forName: ImagesListService.DidChangeNotification,
                 object: nil,
-                queue: .main) { [ weak self] _ in
+                queue: .main) { [weak self] _ in
             self?.updateTableView()
         }
     }

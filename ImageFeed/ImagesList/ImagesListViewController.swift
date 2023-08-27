@@ -23,8 +23,18 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
-        presenter = ImagesListPresenter(viewController: self)
+        if presenter == nil {
+            presenter = ImagesListPresenter(viewController: self,
+                    imagesListService: imagesListService
+            )
+        }
+        presenter?.view = self
         fetchPhotos()
+    }
+
+    func configure(_ presenter: ImagesListPresenterProtocol) {
+        self.presenter = presenter
+        self.presenter?.view = self
     }
 
     private func fetchPhotos() {
@@ -137,8 +147,10 @@ extension ImagesListViewController: ImagesListCellDelegate {
             return
         }
         UIBlockingProgressHUD.show()
-        presenter.togglePhotoLikeStatus(at: indexPath.row) { [ weak self ] isLikeChanged in
-            guard let self = self else { return }
+        presenter.togglePhotoLikeStatus(at: indexPath.row) { [weak self] isLikeChanged in
+            guard let self = self else {
+                return
+            }
             if isLikeChanged {
                 self.photos = self.presenter.photos
                 self.tableView.reloadRows(at: [indexPath], with: .none)

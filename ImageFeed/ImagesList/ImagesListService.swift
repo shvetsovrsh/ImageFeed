@@ -4,7 +4,13 @@
 
 import Foundation
 
-final class ImagesListService {
+public protocol ImagesListServiceProtocol: AnyObject {
+    var photos: [Photo] { get }
+    func fetchPhotosNextPage()
+    func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void)
+}
+
+final class ImagesListService: ImagesListServiceProtocol {
     private let urlSession = URLSession.shared
     private (set) var photos: [Photo] = []
     private let oauth2TokenStorage = OAuth2TokenStorage()
