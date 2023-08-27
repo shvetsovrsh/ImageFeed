@@ -5,7 +5,7 @@
 import UIKit
 import Kingfisher
 
-protocol ProfileViewControllerProtocol: AnyObject {
+public protocol ProfileViewControllerProtocol: AnyObject {
     var presenter: ProfilePresenterProtocol? { get }
     func updateProfileDetails(profile: Profile)
     func showAuthController()
@@ -20,6 +20,7 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
     private let profileService = ProfileService.shared
     private let tokenStorage = OAuth2TokenStorage()
     private let profileHelper = ProfileHelper()
+    private let profileImageService = ProfileImageService.shared
     private var profile: Profile = .standard
     private var profileImageServiceObserver: NSObjectProtocol?
     private var nameLabel: UILabel!
@@ -43,9 +44,22 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
-        presenter = ProfilePresenter(profileService: profileService, profileHelper: profileHelper)
+
+        if presenter == nil {
+            presenter = ProfilePresenter(
+                    profileService: profileService,
+                    profileHelper: profileHelper,
+                    profileImageService: profileImageService
+            )
+        }
+
         presenter?.view = self
         presenter?.viewDidLoad()
+    }
+
+    func configure(_ presenter: ProfilePresenterProtocol) {
+        self.presenter = presenter
+        self.presenter?.view = self
     }
 
     func startListeningForProfileImageChanges(completion: @escaping () -> Void) {

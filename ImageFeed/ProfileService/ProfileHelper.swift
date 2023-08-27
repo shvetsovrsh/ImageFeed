@@ -6,31 +6,18 @@ import UIKit
 import Kingfisher
 
 protocol ProfileHelperProtocol {
-    func updateAvatar(imageView: UIImageView)
+    func fetchImage(url: URL, options: KingfisherOptionsInfo?, completion: @escaping (Result<UIImage, Error>) -> Void)
 }
 
-class ProfileHelper : ProfileHelperProtocol {
-    func updateAvatar(imageView: UIImageView) {
-        guard
-                let profileImageURL = ProfileImageService.shared.avatarURL,
-                let url = URL(string: profileImageURL)
-        else {
-            return
-        }
-        print("updateAvatar to profileImageURL \(url)")
-        let processor = RoundCornerImageProcessor(cornerRadius: 35)
-        imageView.kf.indicatorType = .activity
-        imageView.kf.setImage(with: url,
-                placeholder: UIImage(named: "placeholder.png"),
-                options: [.processor(processor)]) { result in
-
+class ProfileHelper: ProfileHelperProtocol {
+    static let shared = ProfileHelper()
+    func fetchImage(url: URL, options: KingfisherOptionsInfo?, completion: @escaping (Result<UIImage, Error>) -> Void) {
+        KingfisherManager.shared.retrieveImage(with: url, options: options) { result in
             switch result {
-            case .success(let value):
-                print(value.image)
-                print(value.cacheType)
-                print(value.source)
+            case .success(let avatarImage):
+                completion(.success(avatarImage.image))
             case .failure(let error):
-                print(error)
+                completion(.failure(error))
             }
         }
     }

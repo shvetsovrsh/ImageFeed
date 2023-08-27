@@ -4,7 +4,8 @@
 
 import UIKit
 
-protocol ProfilePresenterProtocol {
+public protocol ProfilePresenterProtocol {
+    func updateAvatar()
     func viewDidLoad()
     func didUpdateProfileImage()
     func didTapLogout()
@@ -13,12 +14,16 @@ protocol ProfilePresenterProtocol {
 
 class ProfilePresenter: ProfilePresenterProtocol {
     weak var view: ProfileViewControllerProtocol?
-    let profileService: ProfileService
+    let profileService: ProfileServiceProtocol
     let profileHelper: ProfileHelperProtocol
+    let profileImageService: ProfileImageServiceProtocol
 
-    init(profileService: ProfileService, profileHelper: ProfileHelperProtocol) {
+    init(profileService: ProfileServiceProtocol,
+         profileHelper: ProfileHelperProtocol,
+         profileImageService: ProfileImageServiceProtocol) {
         self.profileService = profileService
         self.profileHelper = profileHelper
+        self.profileImageService = profileImageService
     }
 
     func viewDidLoad() {
@@ -27,14 +32,38 @@ class ProfilePresenter: ProfilePresenterProtocol {
     }
 
     private func setupProfileImageObserver() {
-        profileHelper.updateAvatar(imageView: view?.avatarImageView ?? UIImageView())
+        updateAvatar()
         view?.startListeningForProfileImageChanges { [weak self] in
             self?.didUpdateProfileImage()
         }
     }
 
+    func updateAvatar() {
+        guard
+                let profileImageURL = profileImageService.avatarURL,
+                let url = URL(string: profileImageURL)
+        else {
+            return
+        }
+        profileHelper.fetchImage(url: url, options: nil) { [weak self] result in
+            guard let self else {
+                return
+            }
+            switch result {
+            case .success(let avatarImage):
+                print("updateAvatar to profileImageURL \(url)")
+                self.view?.updateProfileAvatar(avatar: avatarImage)
+            case .failure(_):
+                print("error updating avatar to profileImageURL \(url)")
+                if let placeholderImage = UIImage(named: "placeholder.png") {
+                    self.view?.updateProfileAvatar(avatar: placeholderImage)
+                }
+            }
+        }
+    }
+
     func didUpdateProfileImage() {
-        profileHelper.updateAvatar(imageView: view?.avatarImageView ?? UIImageView())
+        updateAvatar()
     }
 
     private func setupProfileDetails() {

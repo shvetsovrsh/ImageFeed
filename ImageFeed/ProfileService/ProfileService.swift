@@ -5,7 +5,13 @@
 import Foundation
 import WebKit
 
-final class ProfileService {
+protocol ProfileServiceProtocol {
+    func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void)
+    var profile: Profile? {get}
+    func logout()
+}
+
+final class ProfileService: ProfileServiceProtocol {
     static let shared = ProfileService()
     private var task: URLSessionTask?
     private let urlSession = URLSession.shared
