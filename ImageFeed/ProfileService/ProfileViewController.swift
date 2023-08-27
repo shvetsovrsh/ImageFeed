@@ -96,6 +96,7 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
 
     private func createNameLabel(safeArea: UILayoutGuide) {
         nameLabel = UILabel()
+        nameLabel.accessibilityIdentifier = "nameLabel"
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
         nameLabel.text = profile.name
         nameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
@@ -108,6 +109,7 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
 
     private func createLoginNameLabel(safeArea: UILayoutGuide) {
         loginNameLabel = UILabel()
+        loginNameLabel.accessibilityIdentifier = "loginNameLabel"
         loginNameLabel.translatesAutoresizingMaskIntoConstraints = false
         loginNameLabel.text = profile.loginName
         loginNameLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
@@ -158,6 +160,7 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
             profileService.logout()
             showAuthController()
         }
+        logoutAction.accessibilityIdentifier = "logoutAction"
         alertController.addAction(logoutAction)
         alertController.addAction(UIAlertAction(title: "Нет", style: .cancel, handler: nil))
 
