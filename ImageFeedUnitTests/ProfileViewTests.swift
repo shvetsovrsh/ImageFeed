@@ -37,7 +37,6 @@ final class ProfileViewTests: XCTestCase {
         profilePresenter.viewDidLoad()
 
         profileImageService.fetchProfileImageURL(username: "successUsername") { result in
-//            profilePresenter.didUpdateProfileImage()
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
 

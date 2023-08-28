@@ -11,14 +11,11 @@ final class ImagesListPresenterSpy: ImagesListPresenterProtocol {
     var view: ImageFeed.ImagesListViewControllerProtocol?
 
     func fetchPhotosNextPage() {
-
     }
 
     func updateTableView() {
-
     }
 
     func togglePhotoLikeStatus(at index: Int, completion: @escaping (Bool) -> Void) {
-
     }
 }

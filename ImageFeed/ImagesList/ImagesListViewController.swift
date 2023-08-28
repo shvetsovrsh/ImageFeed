@@ -44,8 +44,8 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
     }
 
     func updateTableView() {
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
+        DispatchQueue.main.async { [weak self] in
+            self?.tableView.reloadData()
         }
     }
 

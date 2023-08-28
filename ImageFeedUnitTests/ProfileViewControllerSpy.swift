@@ -10,7 +10,6 @@ final class ProfileViewControllerSpy: ProfileViewControllerProtocol {
     var avatarImageView: UIImageView
 
     func showAuthController() {
-
     }
 
 

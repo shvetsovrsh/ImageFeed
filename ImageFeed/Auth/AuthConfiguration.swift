@@ -4,13 +4,14 @@
 
 import Foundation
 
-let AccessKey = "0wta3LU2MyyfyI6tirHPt2MxIrHWa0QlotVIodvwL2s"
-let SecretKey = "oHHWRixyha3JIjXPsHwGWs9xGXH1ylgYWS_pGK6Ku-c"
-let RedirectURI = "urn:ietf:wg:oauth:2.0:oob"
-let AccessScope = "public+read_user+write_likes"
-let DefaultBaseURL = URL(string: "https://api.unsplash.com")!
-
-let UnsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
+enum AuthConstants {
+    static let accessKey = "0wta3LU2MyyfyI6tirHPt2MxIrHWa0QlotVIodvwL2s"
+    static let secretKey = "oHHWRixyha3JIjXPsHwGWs9xGXH1ylgYWS_pGK6Ku-c"
+    static let redirectURI = "urn:ietf:wg:oauth:2.0:oob"
+    static let accessScope = "public+read_user+write_likes"
+    static let defaultBaseURL = URL(string: "https://api.unsplash.com")!
+    static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
+}
 
 struct AuthConfiguration {
     let accessKey: String
@@ -20,7 +21,14 @@ struct AuthConfiguration {
     let defaultBaseURL: URL
     let authURLString: String
 
-    init(accessKey: String, secretKey: String, redirectURI: String, accessScope: String, authURLString: String, defaultBaseURL: URL) {
+    init(
+            accessKey: String,
+            secretKey: String,
+            redirectURI: String,
+            accessScope: String,
+            authURLString: String,
+            defaultBaseURL: URL
+    ) {
         self.accessKey = accessKey
         self.secretKey = secretKey
         self.redirectURI = redirectURI
@@ -30,11 +38,11 @@ struct AuthConfiguration {
     }
 
     static var standard: AuthConfiguration {
-        AuthConfiguration(accessKey: AccessKey,
-                secretKey: SecretKey,
-                redirectURI: RedirectURI,
-                accessScope: AccessScope,
-                authURLString: UnsplashAuthorizeURLString,
-                defaultBaseURL: DefaultBaseURL)
+        AuthConfiguration(accessKey: AuthConstants.accessKey,
+                secretKey: AuthConstants.secretKey,
+                redirectURI: AuthConstants.redirectURI,
+                accessScope: AuthConstants.accessScope,
+                authURLString: AuthConstants.unsplashAuthorizeURLString,
+                defaultBaseURL: AuthConstants.defaultBaseURL)
     }
 }

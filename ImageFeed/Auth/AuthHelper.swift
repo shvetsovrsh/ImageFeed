@@ -5,7 +5,15 @@
 import Foundation
 
 protocol AuthHelperProtocol {
+    /// Creates an authentication request.
+    ///
+    /// - Returns: An authentication request.
     func authRequest() -> URLRequest
+
+    /// Extracts the authentication code from a URL.
+    ///
+    /// - Parameter url: The URL containing the authentication code.
+    /// - Returns: The authentication code if found in the URL.
     func code(from url: URL) -> String?
 }
 
@@ -36,8 +44,7 @@ class AuthHelper: AuthHelperProtocol {
         if let urlComponents = URLComponents(string: url.absoluteString),
            urlComponents.path == "/oauth/authorize/native",
            let items = urlComponents.queryItems,
-           let codeItem = items.first(where: { $0.name == "code" })
-        {
+           let codeItem = items.first(where: { $0.name == "code" }) {
             return codeItem.value
         } else {
             return nil

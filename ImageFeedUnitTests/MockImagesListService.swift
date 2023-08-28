@@ -14,8 +14,5 @@ class MockImagesListService: ImagesListServiceProtocol {
     }
 
     func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void) {
-
     }
-
-
 }

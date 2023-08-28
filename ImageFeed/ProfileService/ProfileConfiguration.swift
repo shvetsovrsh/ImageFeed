@@ -4,10 +4,12 @@
 
 import Foundation
 
-let Username = "ekaterina_nov"
-let Name = "Екатерина Новикова"
-let LoginName = "@ekaterina_nov"
-let Bio = "Hello, World!"
+enum UserProfileConstants {
+    static let username = "ekaterina_nov"
+    static let name = "Екатерина Новикова"
+    static let loginName = "@ekaterina_nov"
+    static let bio = "Hello, World!"
+}
 
 public struct Profile {
     let username: String
@@ -31,10 +33,10 @@ public struct Profile {
 
     static var standard: Profile {
         Profile(
-                username: Username,
-                name: Name,
-                loginName: LoginName,
-                bio: Bio
+                username: UserProfileConstants.username,
+                name: UserProfileConstants.name,
+                loginName: UserProfileConstants.loginName,
+                bio: UserProfileConstants.bio
         )
     }
 }

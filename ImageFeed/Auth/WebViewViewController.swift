@@ -11,9 +11,22 @@ protocol WebViewViewControllerDelegate: AnyObject {
 }
 
 public protocol WebViewViewControllerProtocol: AnyObject {
+    /// The presenter associated with the view.
     var presenter: WebViewPresenterProtocol? { get set }
+
+    /// Load a URL request in the WebView.
+    ///
+    /// - Parameter request: The URLRequest to load.
     func load(request: URLRequest)
+
+    /// Set the progress value of a progress indicator.
+    ///
+    /// - Parameter newValue: The new progress value.
     func setProgressValue(_ newValue: Float)
+
+    /// Set the visibility of a progress indicator.
+    ///
+    /// - Parameter isHidden: `true` to hide the indicator, `false` to show it.
     func setProgressHidden(_ isHidden: Bool)
 }
 
@@ -50,7 +63,12 @@ final class WebViewViewController: UIViewController & WebViewViewControllerProto
         webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), context: nil)
     }
 
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+    override func observeValue(
+            forKeyPath keyPath: String?,
+            of object: Any?,
+            change: [NSKeyValueChangeKey: Any]?,
+            context: UnsafeMutableRawPointer?
+    ) {
         if keyPath == #keyPath(WKWebView.estimatedProgress) {
             presenter?.didUpdateProgressValue(webView.estimatedProgress)
         } else {

@@ -5,10 +5,19 @@
 import UIKit
 
 public protocol ProfilePresenterProtocol {
+    /// Notifies the presenter to update the profile avatar.
     func updateAvatar()
+
+    /// Notifies the presenter that the view has loaded.
     func viewDidLoad()
+
+    /// Notifies the presenter that the profile image has been updated.
     func didUpdateProfileImage()
+
+    /// Notifies the presenter that the user tapped the logout button.
     func didTapLogout()
+
+    /// The view associated with the presenter.
     var view: ProfileViewControllerProtocol? { get set }
 }
 

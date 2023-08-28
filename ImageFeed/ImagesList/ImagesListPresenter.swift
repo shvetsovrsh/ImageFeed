@@ -38,7 +38,10 @@ class ImagesListPresenter: ImagesListPresenterProtocol {
     }
 
     func updateTableView() {
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else {
+                return
+            }
             let oldCount = self.photos.count
             let newCount = self.imagesListService.photos.count
             self.photos = self.imagesListService.photos
@@ -58,7 +61,10 @@ class ImagesListPresenter: ImagesListPresenterProtocol {
             }
             switch result {
             case .success(_):
-                DispatchQueue.main.async {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else {
+                        return
+                    }
                     self.photos = self.imagesListService.photos
                     completion(true)
                 }

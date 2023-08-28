@@ -59,6 +59,7 @@ final class ImageFeedUITests: XCTestCase {
 
         let cellToLike = tablesQuery.children(matching: .cell).element(boundBy: 1)
 
+        cellToLike.buttons["like button off"].tap()
         cellToLike.buttons["like button on"].tap()
 
         sleep(2)
