@@ -60,9 +60,9 @@ private extension OAuth2Service {
     private func authTokenRequest(code: String) -> URLRequest {
         URLRequest.makeHTTPRequest(
                 path: "/oauth/token"
-                        + "?client_id=\(AccessKey)"
-                        + "&&client_secret=\(SecretKey)"
-                        + "&&redirect_uri=\(RedirectURI)"
+                        + "?client_id=\(AuthConstants.accessKey)"
+                        + "&&client_secret=\(AuthConstants.secretKey)"
+                        + "&&redirect_uri=\(AuthConstants.redirectURI)"
                         + "&&code=\(code)"
                         + "&&grant_type=authorization_code",
                 httpMethod: "POST",
@@ -75,13 +75,6 @@ private extension OAuth2Service {
         let tokenType: String
         let scope: String
         let createdAt: Int
-
-        enum CodingKeys: String, CodingKey {
-            case accessToken = "access_token"
-            case tokenType = "token_type"
-            case scope
-            case createdAt = "created_at"
-        }
     }
 }
 
@@ -91,7 +84,7 @@ extension URLRequest {
     static func makeHTTPRequest(
             path: String,
             httpMethod: String,
-            baseURL: URL = DefaultBaseURL
+            baseURL: URL = AuthConstants.defaultBaseURL
     ) -> URLRequest {
         var request = URLRequest(url: URL(string: path, relativeTo: baseURL)!)
         request.httpMethod = httpMethod

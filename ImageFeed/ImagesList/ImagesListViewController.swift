@@ -7,35 +7,46 @@
 
 import UIKit
 
-final class ImagesListViewController: UIViewController {
+public protocol ImagesListViewControllerProtocol {
+    func updateTableViewAnimated(from oldCount: Int, to newCount: Int)
+}
+
+final class ImagesListViewController: UIViewController, ImagesListViewControllerProtocol {
+    private var presenter: ImagesListPresenterProtocol!
     var photos: [Photo] = []
     private let imagesListService = ImagesListService()
 
-    private let ShowSingleImageSegueIdentifier = "ShowSingleImage"
+    let ShowSingleImageSegueIdentifier = "ShowSingleImage"
 
     @IBOutlet private var tableView: UITableView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
-        fetchPhotos()
-
-        NotificationCenter.default.addObserver(
-                forName: ImagesListService.DidChangeNotification,
-                object: nil,
-                queue: .main
-        ) { [weak self] _ in
-            guard let self else {
-                return
-            }
-            self.updateTableViewAnimated()
+        if presenter == nil {
+            presenter = ImagesListPresenter(viewController: self,
+                    imagesListService: imagesListService
+            )
         }
+        presenter?.view = self
+        fetchPhotos()
+    }
+
+    func configure(_ presenter: ImagesListPresenterProtocol) {
+        self.presenter = presenter
+        self.presenter?.view = self
     }
 
     private func fetchPhotos() {
-        imagesListService.fetchPhotosNextPage()
-        photos = imagesListService.photos
-        tableView.reloadData()
+        presenter.fetchPhotosNextPage()
+        photos = presenter.photos
+        updateTableView()
+    }
+
+    func updateTableView() {
+        DispatchQueue.main.async { [weak self] in
+            self?.tableView.reloadData()
+        }
     }
 
     @objc private func handlePhotosChangeNotification() {
@@ -56,10 +67,8 @@ final class ImagesListViewController: UIViewController {
         }
     }
 
-    private func updateTableViewAnimated() {
-        let oldCount = photos.count
-        let newCount = imagesListService.photos.count
-        photos = imagesListService.photos
+    func updateTableViewAnimated(from oldCount: Int, to newCount: Int) {
+        self.photos = self.presenter.photos
         if oldCount != newCount {
             tableView.performBatchUpdates {
                 let indexPaths = (oldCount..<newCount).map { i in
@@ -125,10 +134,10 @@ extension ImagesListViewController: UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        guard indexPath.row + 1 == imagesListService.photos.count else {
+        guard indexPath.row + 1 == presenter.photos.count else {
             return
         }
-        imagesListService.fetchPhotosNextPage()
+        presenter.fetchPhotosNextPage()
     }
 }
 
@@ -137,17 +146,20 @@ extension ImagesListViewController: ImagesListCellDelegate {
         guard let indexPath = tableView.indexPath(for: cell) else {
             return
         }
-        let photo = photos[indexPath.row]
         UIBlockingProgressHUD.show()
-        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { result in
-            switch result {
-            case .success:
-                self.photos = self.imagesListService.photos
+        presenter.togglePhotoLikeStatus(at: indexPath.row) { [weak self] isLikeChanged in
+            guard let self = self else {
+                return
+            }
+            if isLikeChanged {
+                self.photos = self.presenter.photos
+                self.tableView.reloadRows(at: [indexPath], with: .none)
                 cell.setIsLiked(self.photos[indexPath.row].isLiked)
                 UIBlockingProgressHUD.dismiss()
-            case .failure:
+            } else {
                 UIBlockingProgressHUD.dismiss()
                 self.showAlertViewController()
+                return
             }
         }
     }
